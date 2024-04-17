@@ -1,0 +1,106 @@
+[gd_scene load_steps=11 format=3 uid="uid://c1afmqop6jief"]
+
+[ext_resource type="Script" path="res://base.gd" id="1_s0dmj"]
+[ext_resource type="Script" path="res://Player.gd" id="1_ve5al"]
+[ext_resource type="Script" path="res://CameraNode.gd" id="2_tbs0k"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_offit"]
+sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+ground_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+
+[sub_resource type="Sky" id="Sky_mpju4"]
+sky_material = SubResource("ProceduralSkyMaterial_offit")
+
+[sub_resource type="Environment" id="Environment_minyu"]
+background_mode = 2
+sky = SubResource("Sky_mpju4")
+tonemap_mode = 2
+ssao_enabled = true
+glow_enabled = true
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_r4mlp"]
+friction = 0.0
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_n5wnb"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_pky5u"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_85t2f"]
+height = 0.1
+radius = 0.45
+
+[node name="Base" type="Node"]
+script = ExtResource("1_s0dmj")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_minyu")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, 0.75, -0.433013, 0, 0, 0)
+shadow_enabled = true
+
+[node name="DebugTerrain" type="Node" parent="."]
+
+[node name="CSGBox3D" type="CSGBox3D" parent="DebugTerrain"]
+use_collision = true
+collision_layer = 3
+collision_mask = 3
+size = Vector3(20, 1, 20)
+
+[node name="CSGBox3D2" type="CSGBox3D" parent="DebugTerrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.5, 5.125, 0)
+use_collision = true
+collision_layer = 3
+collision_mask = 3
+size = Vector3(1, 9.25, 20)
+
+[node name="CSGBox3D3" type="CSGBox3D" parent="DebugTerrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.5, 5.125, 0)
+use_collision = true
+collision_layer = 3
+collision_mask = 3
+size = Vector3(1, 9.25, 20)
+
+[node name="CSGBox3D4" type="CSGBox3D" parent="DebugTerrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 9.25, -4.75)
+use_collision = true
+collision_layer = 3
+collision_mask = 3
+size = Vector3(18, 1, 10.5)
+
+[node name="Player" type="RigidBody3D" parent="." node_paths=PackedStringArray("primaryCamera")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.25, 0)
+axis_lock_angular_x = true
+axis_lock_angular_y = true
+axis_lock_angular_z = true
+physics_material_override = SubResource("PhysicsMaterial_r4mlp")
+can_sleep = false
+continuous_cd = true
+script = ExtResource("1_ve5al")
+primaryCamera = NodePath("../CameraNode/PrimaryCamera")
+
+[node name="Collider" type="CollisionShape3D" parent="Player"]
+shape = SubResource("CylinderShape3D_n5wnb")
+
+[node name="Mesh" type="MeshInstance3D" parent="Player"]
+mesh = SubResource("CapsuleMesh_pky5u")
+
+[node name="CameraHint" type="Marker3D" parent="Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
+
+[node name="Stander" type="Area3D" parent="Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
+collision_layer = 2
+collision_mask = 2
+
+[node name="Collider" type="CollisionShape3D" parent="Player/Stander"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.675, 0)
+shape = SubResource("CylinderShape3D_85t2f")
+
+[node name="CameraNode" type="Node" parent="." node_paths=PackedStringArray("cameraHint")]
+script = ExtResource("2_tbs0k")
+cameraHint = NodePath("../Player/CameraHint")
+cameraMode = "FPS"
+
+[node name="PrimaryCamera" type="Camera3D" parent="CameraNode"]
+fov = 90.0
